@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
@@ -5,7 +6,7 @@ namespace Oldsu.ScoreServer.Controllers
 {
     [ApiController]
     [Route("/web/osu-submit-modular.php")]
-    public class ScoreSubmission : ControllerBase
+    public class ScoreSubmission : ControllerBase, IOsuController
     {
         private readonly ILogger<ScoreSubmission> _logger;
 
@@ -19,6 +20,11 @@ namespace Oldsu.ScoreServer.Controllers
         {
             // TODO
             return "0";
+        }
+
+        public async Task<string> GetResponse()
+        {
+            return "";
         }
     }
 }
