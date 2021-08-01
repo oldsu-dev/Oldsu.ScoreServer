@@ -38,11 +38,6 @@ namespace Oldsu.ScoreServer.Controllers
             if (user == null)
                 return Content("error");
             
-            var scoresOnMap = await db.Scores
-                .Where(s => s.BeatmapHash.Equals(mapHash))
-                .Include(s => s.User)
-                .ToArrayAsync();
-            
             var beatmap = await db.Beatmaps
                 .Where(b => b.BeatmapHash.Equals(mapHash))
                 .Include(b => b.Beatmapset)
@@ -50,6 +45,11 @@ namespace Oldsu.ScoreServer.Controllers
 
             if (beatmap == null)
                 return Content("-1\n0\n \n0");
+            
+            var scoresOnMap = db.Scores
+                .Where(s => s.BeatmapHash.Equals(mapHash))
+                .Include(s => s.User)
+                .AsAsyncEnumerable();
 
             /*
              `response`:
@@ -64,12 +64,12 @@ namespace Oldsu.ScoreServer.Controllers
             
             var responseString = $"{beatmap.Beatmapset.RankingStatus}\n0\n \n{beatmap.Rating}\n";
             
-            var scoresAlreadyAdded = new List<string>();
+            var scoresAlreadyAdded = new HashSet<string>();
             var scores = new StringBuilder();
             var personalBestScore = "\n";
             var leaderboardRank = 1;
             
-            foreach (var score in scoresOnMap)
+            await foreach (var score in scoresOnMap)
                 // only adds users whose username isn't yet in `scoresAlreadyAdded`
                 if (scoresAlreadyAdded.FirstOrDefault(u => u.Contains(score.User.Username)) == null)
                 {
