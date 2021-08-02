@@ -4,6 +4,6 @@ namespace Oldsu.ScoreServer.Controllers
 {
     public interface IOsuController
     {
-        public Task<string> GetResponse();
+        public Task WriteResponse();
     }
 }

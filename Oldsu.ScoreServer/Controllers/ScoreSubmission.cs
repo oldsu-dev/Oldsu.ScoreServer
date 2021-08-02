@@ -22,9 +22,9 @@ namespace Oldsu.ScoreServer.Controllers
             return "0";
         }
 
-        public async Task<string> GetResponse()
+        public async Task WriteResponse()
         {
-            return "";
+            
         }
     }
 }
