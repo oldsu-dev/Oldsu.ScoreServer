@@ -30,8 +30,10 @@ namespace Oldsu.ScoreServer.Controllers.OsuControllers
         [HttpGet]
         public async Task Get()
         {
+#if DEBUG
             Stopwatch sw = new Stopwatch();
             sw.Start();
+#endif
             
             var db = new Database();
             
@@ -77,9 +79,10 @@ namespace Oldsu.ScoreServer.Controllers.OsuControllers
 
             await WriteResponse();
             
+#if DEBUG
             sw.Stop();
-
             Console.WriteLine("Elapsed={0}",sw.ElapsedMilliseconds);
+#endif
         }
 
         public async Task WriteResponse()
