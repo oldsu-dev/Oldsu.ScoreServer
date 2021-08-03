@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -9,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Oldsu.Types;
 
-namespace Oldsu.ScoreServer.Controllers
+namespace Oldsu.ScoreServer.Controllers.OsuControllers
 {
     [ApiController]
     [Route("/web/osu-getscores6.php")]
@@ -32,7 +31,6 @@ namespace Oldsu.ScoreServer.Controllers
         public async Task Get()
         {
             Stopwatch sw = new Stopwatch();
-
             sw.Start();
             
             var db = new Database();

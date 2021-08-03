@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 
-namespace Oldsu.ScoreServer.Controllers
+namespace Oldsu.ScoreServer.Controllers.OsuControllers
 {
     public interface IOsuController
     {

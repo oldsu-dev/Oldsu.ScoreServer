@@ -2,7 +2,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
-namespace Oldsu.ScoreServer.Controllers
+namespace Oldsu.ScoreServer.Controllers.OsuControllers
 {
     [ApiController]
     [Route("/web/osu-submit-modular.php")]
