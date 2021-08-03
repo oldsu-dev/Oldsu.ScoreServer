@@ -17,7 +17,7 @@ namespace Oldsu.ScoreServer.Controllers
     {
         private readonly ILogger<ScoreSubmission> _logger;
 
-        private User _requestingUser;
+        private UserInfo _requestingUser;
         private Beatmap _beatmap;
         private byte _gamemode;
         
@@ -39,7 +39,7 @@ namespace Oldsu.ScoreServer.Controllers
             
             var userId = HttpContext.Request.Query["u"].ToString();
             
-            _requestingUser = await db.Users
+            _requestingUser = await db.UserInfo
                 .FindAsync(uint.Parse(userId));
 
             // the requesting user is not found from the database, end the request
@@ -71,7 +71,7 @@ namespace Oldsu.ScoreServer.Controllers
                 .Where(s => s.BeatmapHash.Equals(mapHash) &&
                             s.Gamemode.Equals(_gamemode) &&
                             s.Passed)
-                .Include(s => s.User)
+                .Include(s => s.UserInfo)
                 .OrderByDescending(s => s.Score)
                 .Take(50)
                 .AsQueryable()
@@ -109,7 +109,7 @@ namespace Oldsu.ScoreServer.Controllers
                             s.Gamemode.Equals(_gamemode) &&
                             s.UserId.Equals(_requestingUser.UserID) &&
                             s.Passed)
-                .Include(s => s.User)
+                .Include(s => s.UserInfo)
                 .FirstOrDefaultAsync();
 
             if (personalBestScore != null)
