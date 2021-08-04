@@ -35,7 +35,7 @@ namespace Oldsu.ScoreServer.Controllers.OsuControllers
             sw.Start();
 #endif
             
-            var db = new Database();
+            await using var db = new Database();
             
             var userId = HttpContext.Request.Query["u"].ToString();
             
@@ -102,7 +102,7 @@ namespace Oldsu.ScoreServer.Controllers.OsuControllers
             await HttpContext.Response.WriteStringAsync(
                 $"{_beatmap.Beatmapset.RankingStatus}\n0\n \n{_beatmap.Rating}\n");
 
-            var db = new Database();
+            await using var db = new Database();
             
             // get personal best score and write it to the content stream, if it doesnt exist just write /n
             // yes it's a pretty hefty query but what can you do
