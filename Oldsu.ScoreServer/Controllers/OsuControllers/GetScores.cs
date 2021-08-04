@@ -79,6 +79,7 @@ namespace Oldsu.ScoreServer.Controllers.OsuControllers
 
             await WriteResponse();
             
+            await HttpContext.Response.CompleteAsync();
 #if DEBUG
             sw.Stop();
             Console.WriteLine("Elapsed={0}",sw.ElapsedMilliseconds);
@@ -120,8 +121,6 @@ namespace Oldsu.ScoreServer.Controllers.OsuControllers
             
             await foreach (var score in _scoresOnMap)
                 await HttpContext.Response.WriteStringAsync(score.ToString());
-
-            await HttpContext.Response.CompleteAsync();
         }
     }
 }

@@ -16,10 +16,12 @@ namespace Oldsu.ScoreServer.Controllers.OsuControllers
         }
 
         [HttpGet]
-        public string Get()
+        public async Task Get()
         {
             // TODO
-            return "0";
+            await WriteResponse();
+            
+            await HttpContext.Response.CompleteAsync();
         }
 
         public async Task WriteResponse()
