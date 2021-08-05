@@ -6,12 +6,12 @@ namespace Oldsu.ScoreServer.Cache
 {
     public class RedisScoreManager : IScoreManager
     {
-        public Task<IAsyncEnumerable<HighScoreWithRank>> GetScores(string hash, byte gamemode)
+        public Task<List<HighScoreWithRank>> GetScoresAsync(string hash, byte gamemode)
         {
             throw new System.NotImplementedException();
         }
 
-        public Task<HighScoreWithRank> GetPersonalBest(string hash, byte gamemode, uint userId)
+        public Task<HighScoreWithRank> GetPersonalBestAsync(string hash, byte gamemode, uint userId)
         {
             throw new System.NotImplementedException();
         }

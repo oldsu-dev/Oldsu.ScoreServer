@@ -12,20 +12,20 @@ namespace Oldsu.ScoreServer.Cache
     {
         private readonly AsyncDictionaryWithExpiration<(string, byte)> _mapLeaderboardCache = new ();
         private readonly AsyncDictionaryWithExpiration<(string, byte, uint)> _personalBestCache = new ();
-        
-        public async Task<IAsyncEnumerable<HighScoreWithRank>> GetScores(string hash, byte gamemode)
+
+        public async Task<List<HighScoreWithRank>> GetScoresAsync(string hash, byte gamemode)
         {
             var (isFound, value) = await _mapLeaderboardCache.TryGetValue((hash, gamemode));
 
             if (isFound)
             {
-                return value as IAsyncEnumerable<HighScoreWithRank>;
+                return value as List<HighScoreWithRank>;
             }
             else
             {
                 await using var db = new Database();
                 
-                var scoresOnMap = db.HighScoresWithRank
+                var scoresOnMap = await db.HighScoresWithRank
                     .Where(s => s.BeatmapHash.Equals(hash) &&
                                 s.Gamemode.Equals(gamemode) &&
                                 s.Passed)
@@ -33,15 +33,15 @@ namespace Oldsu.ScoreServer.Cache
                     .OrderByDescending(s => s.Score)
                     .Take(50)
                     .AsQueryable()
-                    .AsAsyncEnumerable();
+                    .ToListAsync();
 
-                await AddScoresIntoCache(hash, gamemode, scoresOnMap);
+                AddScoresIntoCache(hash, gamemode, scoresOnMap);
 
                 return scoresOnMap;
             }
         }
 
-        public async Task<HighScoreWithRank> GetPersonalBest(string hash, byte gamemode, uint userId)
+        public async Task<HighScoreWithRank> GetPersonalBestAsync(string hash, byte gamemode, uint userId)
         {
             var (isFound, value) = await _personalBestCache.TryGetValue((hash, gamemode, userId));
 
@@ -61,13 +61,13 @@ namespace Oldsu.ScoreServer.Cache
                     .Include(s => s.User)
                     .FirstOrDefaultAsync();
 
-                await AddPersonalBestScoreIntoCache(hash, gamemode, userId, personalBestScore);
+                AddPersonalBestScoreIntoCache(hash, gamemode, userId, personalBestScore);
 
                 return personalBestScore;
             }
         }
 
-        private async Task AddScoresIntoCache(string hash, byte gamemode, IAsyncEnumerable<HighScoreWithRank> scores) 
+        private async Task AddScoresIntoCache(string hash, byte gamemode, List<HighScoreWithRank> scores) 
             => await _mapLeaderboardCache.TryAdd((hash, gamemode), scores, DateTime.Now.AddSeconds(20));
 
         private async Task AddPersonalBestScoreIntoCache(string hash, byte gamemode, uint userId, HighScoreWithRank score)
