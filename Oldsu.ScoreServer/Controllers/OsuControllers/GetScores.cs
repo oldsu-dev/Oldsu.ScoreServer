@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Oldsu.ScoreServer.Cache;
 using Oldsu.Types;
 
 namespace Oldsu.ScoreServer.Controllers.OsuControllers
@@ -15,26 +16,29 @@ namespace Oldsu.ScoreServer.Controllers.OsuControllers
     public class GetScores : ControllerBase, IOsuController
     {
         private readonly ILogger<ScoreSubmission> _logger;
+        private readonly Database _db;
+
+        // change to redis when needed
+        private static IScoreManager _scoreManager = new NativeScoreManager();
 
         private UserInfo _requestingUser;
         private Beatmap _beatmap;
         private byte _gamemode;
         
-        private IAsyncEnumerable<HighScoreWithRank> _scoresOnMap;
+        private List<HighScoreWithRank> _scoresOnMap;
 
-        public GetScores(ILogger<ScoreSubmission> logger)
+        public GetScores(ILogger<ScoreSubmission> logger, Database database)
         {
             _logger = logger;
+            _db = database;
         }
 
         [HttpGet]
         public async Task Get()
         {
-#if DEBUG
             Stopwatch sw = new Stopwatch();
             sw.Start();
-#endif
-            
+
             await using var db = new Database();
             
             var userId = HttpContext.Request.Query["u"].ToString();
@@ -67,23 +71,14 @@ namespace Oldsu.ScoreServer.Controllers.OsuControllers
 
             _gamemode = byte.Parse(HttpContext.Request.Query["m"]);
             
-            _scoresOnMap = db.HighScoresWithRank
-                .Where(s => s.BeatmapHash.Equals(mapHash) &&
-                            s.Gamemode.Equals(_gamemode) &&
-                            s.Passed)
-                .Include(s => s.UserInfo)
-                .OrderByDescending(s => s.Score)
-                .Take(50)
-                .AsQueryable()
-                .AsAsyncEnumerable();
+            _scoresOnMap = await _scoreManager.GetScoresAsync(
+                _beatmap.BeatmapHash, _gamemode);
 
             await WriteResponse();
             
             await HttpContext.Response.CompleteAsync();
-#if DEBUG
             sw.Stop();
             Console.WriteLine("Elapsed={0}",sw.ElapsedMilliseconds);
-#endif
         }
 
         public async Task WriteResponse()
@@ -102,24 +97,17 @@ namespace Oldsu.ScoreServer.Controllers.OsuControllers
             await HttpContext.Response.WriteStringAsync(
                 $"{_beatmap.Beatmapset.RankingStatus}\n0\n \n{_beatmap.Rating}\n");
 
-            await using var db = new Database();
-            
             // get personal best score and write it to the content stream, if it doesnt exist just write /n
             // yes it's a pretty hefty query but what can you do
-            var personalBestScore = await db.HighScoresWithRank
-                .Where(s => s.BeatmapHash.Equals(_beatmap.BeatmapHash) &&
-                            s.Gamemode.Equals(_gamemode) &&
-                            s.UserId.Equals(_requestingUser.UserID) &&
-                            s.Passed)
-                .Include(s => s.UserInfo)
-                .FirstOrDefaultAsync();
+            var personalBestScore = await _scoreManager.GetPersonalBestAsync(
+                _beatmap.BeatmapHash, _gamemode, _requestingUser.UserID);
 
             if (personalBestScore != null)
                 await HttpContext.Response.WriteStringAsync(personalBestScore.ToString());
             else
                 await HttpContext.Response.WriteStringAsync("\n");
             
-            await foreach (var score in _scoresOnMap)
+            foreach (var score in _scoresOnMap)
                 await HttpContext.Response.WriteStringAsync(score.ToString());
         }
     }
