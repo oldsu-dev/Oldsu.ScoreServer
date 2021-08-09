@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Oldsu.ScoreServer.Cache;
+using Oldsu.ScoreServer.Managers;
 using Oldsu.Types;
 
 namespace Oldsu.ScoreServer.Controllers.OsuControllers

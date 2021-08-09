@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Oldsu.Types;
 
-namespace Oldsu.ScoreServer.Cache
+namespace Oldsu.ScoreServer.Managers
 {
     public class RedisScoreManager : IScoreManager
     {

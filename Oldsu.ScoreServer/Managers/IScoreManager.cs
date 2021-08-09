@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
 using Oldsu.Types;
 
-namespace Oldsu.ScoreServer.Cache
+namespace Oldsu.ScoreServer.Managers
 {
     interface IScoreManager
     {

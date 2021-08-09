@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Oldsu.Types;
 using Oldsu.Utils.Cache;
 
-namespace Oldsu.ScoreServer.Cache
+namespace Oldsu.ScoreServer.Managers
 {
     public class NativeScoreManager : IScoreManager
     {
