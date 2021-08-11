@@ -52,11 +52,21 @@ namespace Oldsu.ScoreServer.Controllers.OsuControllers
                 return;
             }
 
+            var beatmap = await db.Beatmaps
+                .Where(b => b.BeatmapHash == serializedScore.BeatmapHash)
+                .Include(b => b.Beatmapset)
+                .FirstOrDefaultAsync();
+
+            if (beatmap == null)
+                await db.TestAddMapAsync(serializedScore.BeatmapHash);
+            
+            beatmap = await db.Beatmaps
+                .Where(b => b.BeatmapHash == serializedScore.BeatmapHash)
+                .Include(b => b.Beatmapset)
+                .FirstOrDefaultAsync();
+            
             var submitManager = new ScoreSubmitManager
-                (serializedScore, await db.Beatmaps
-                    .Where(b => b.BeatmapHash == serializedScore.BeatmapHash)
-                    .Include(b => b.Beatmapset)
-                    .FirstOrDefaultAsync());
+                (serializedScore, beatmap);
 
             if (!submitManager.SetStrategy())
             {
@@ -79,6 +89,14 @@ namespace Oldsu.ScoreServer.Controllers.OsuControllers
             }
 
             var oldStats = await db.StatsWithRank
+                .Where(s => s.UserID == user.UserID)
+                .AsNoTracking()
+                .FirstOrDefaultAsync();
+
+            if (oldStats == null)
+                await db.AddStatsAsync(user.UserID, serializedScore.Gamemode);
+            
+            oldStats = await db.StatsWithRank
                 .Where(s => s.UserID == user.UserID)
                 .AsNoTracking()
                 .FirstOrDefaultAsync();
