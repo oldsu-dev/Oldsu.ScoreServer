@@ -28,6 +28,9 @@ namespace Oldsu.ScoreServer.Controllers.OsuControllers
             var serializedScore = await TypeExtensions.SerializeScoreString(
                 HttpContext.Request.Query["score"].ToString().Split(":"));
 
+            if (serializedScore.Passed)
+                return;
+
             await using var db = new Database();
 
             var user = await db.AuthenticateAsync(
@@ -81,8 +84,7 @@ namespace Oldsu.ScoreServer.Controllers.OsuControllers
                 .FirstOrDefaultAsync();
             
             var newStats = db.Entry(oldStats).CurrentValues.Clone().ToObject() as StatsWithRank;
-            db.Attach(newStats!);
-            
+
             var oldScore = await db.HighScoresWithRank
                 .Where(s => s.BeatmapHash == serializedScore.BeatmapHash)
                 .FirstOrDefaultAsync();

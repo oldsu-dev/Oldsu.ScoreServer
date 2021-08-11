@@ -84,7 +84,6 @@ namespace Oldsu.ScoreServer.Managers
 
         public void UpdateStats(StatsWithRank userStats, HighScoreWithRank? oldScore)
         {
-            // updates other stats than ranked score ill change position, sp
             userStats.UpdateStats(_score);
             
             if (_score.Passed)
