@@ -5,8 +5,8 @@ using Microsoft.Extensions.Logging;
 namespace Oldsu.ScoreServer.Controllers.OsuControllers
 {
     [ApiController]
-    [Route("/web/osu-submit-modular.php")]
-    public class ScoreSubmission : ControllerBase, IOsuController
+    [Route("/web/osu-submit.php")]
+    public class ScoreSubmission : ControllerBase
     {
         private readonly ILogger<ScoreSubmission> _logger;
 
@@ -18,15 +18,8 @@ namespace Oldsu.ScoreServer.Controllers.OsuControllers
         [HttpGet]
         public async Task Get()
         {
-            // TODO
-            await WriteResponse();
-            
-            await HttpContext.Response.CompleteAsync();
-        }
 
-        public async Task WriteResponse()
-        {
-            
+            await HttpContext.Response.CompleteAsync();
         }
     }
 }

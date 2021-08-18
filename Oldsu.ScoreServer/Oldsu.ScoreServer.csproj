@@ -8,4 +8,8 @@
       <ProjectReference Include="..\oldsu\oldsu\Oldsu.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="EntityFramework" Version="6.1.3" />
+    </ItemGroup>
+
 </Project>
