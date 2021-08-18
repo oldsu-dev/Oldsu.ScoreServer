@@ -11,7 +11,7 @@ namespace Oldsu.ScoreServer.Controllers.OsuControllers
 {
     [ApiController]
     [Route("/web/osu-submit-new.php")]
-    public class ScoreSubmitNew : ControllerBase, IOsuController // score submission for atleast 2009-2012
+    public class ScoreSubmitNew : ControllerBase // score submission for atleast 2009-2012
     {
         private readonly ILogger<ScoreSubmission> _logger;
         
@@ -125,11 +125,6 @@ namespace Oldsu.ScoreServer.Controllers.OsuControllers
                 submitManager.GetScorePanelString((newScore, oldScore), (newStats, oldStats), nextUserStats));
             
             await HttpContext.Response.CompleteAsync();
-        }
-
-        public async Task WriteResponse()
-        {
-            throw new System.NotImplementedException();
         }
     }
 }

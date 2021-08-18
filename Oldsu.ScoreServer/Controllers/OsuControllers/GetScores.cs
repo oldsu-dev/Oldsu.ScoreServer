@@ -13,7 +13,7 @@ namespace Oldsu.ScoreServer.Controllers.OsuControllers
 {
     [ApiController]
     [Route("/web/osu-getscores6.php")]
-    public class GetScores : ControllerBase, IOsuController
+    public class GetScores : ControllerBase
     {
         private readonly ILogger<ScoreSubmission> _logger;
         private readonly Database _db;
@@ -74,15 +74,6 @@ namespace Oldsu.ScoreServer.Controllers.OsuControllers
             _scoresOnMap = await _scoreManager.GetScoresAsync(
                 _beatmap.BeatmapHash, _gamemode);
 
-            await WriteResponse();
-            
-            await HttpContext.Response.CompleteAsync();
-            sw.Stop();
-            Console.WriteLine("Elapsed={0}",sw.ElapsedMilliseconds);
-        }
-
-        public async Task WriteResponse()
-        {
             /*
              `response`:
                ranking status: approved, unranked, ranked, etc..
@@ -109,6 +100,11 @@ namespace Oldsu.ScoreServer.Controllers.OsuControllers
             
             foreach (var score in _scoresOnMap)
                 await HttpContext.Response.WriteStringAsync(score.ToString());
+            
+            await HttpContext.Response.CompleteAsync();
+            
+            sw.Stop();
+            Console.WriteLine("Elapsed={0}",sw.ElapsedMilliseconds);
         }
     }
 }
