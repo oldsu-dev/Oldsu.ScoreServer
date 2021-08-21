@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Oldsu.Enums;
 using Oldsu.ScoreServer.Managers;
 using Oldsu.Types;
 using Oldsu.Utils;
@@ -90,7 +91,8 @@ namespace Oldsu.ScoreServer.Controllers.OsuControllers
             }
 
             var oldStats = await db.StatsWithRank
-                .Where(s => s.UserID == user.UserID)
+                .Where(s => s.UserID == user.UserID &&
+                            s.Mode == (Mode)serializedScore.Gamemode)
                 .AsNoTracking()
                 .FirstOrDefaultAsync();
 
@@ -98,29 +100,33 @@ namespace Oldsu.ScoreServer.Controllers.OsuControllers
                 await db.AddStatsAsync(user.UserID, serializedScore.Gamemode);
             
             oldStats = await db.StatsWithRank
-                .Where(s => s.UserID == user.UserID)
+                .Where(s => s.UserID == user.UserID &&
+                            s.Mode == (Mode)serializedScore.Gamemode)
                 .AsNoTracking()
                 .FirstOrDefaultAsync();
             
             var newStats = db.Entry(oldStats).CurrentValues.Clone().ToObject() as StatsWithRank;
 
             var oldScore = await db.HighScoresWithRank
-                .Where(s => s.BeatmapHash == serializedScore.BeatmapHash)
+                .Where(s => s.BeatmapHash == serializedScore.BeatmapHash &&
+                            s.Gamemode == serializedScore.Gamemode)
                 .FirstOrDefaultAsync();
 
             await submitManager.SubmitScore();
             
             var newScore = await db.HighScoresWithRank                
-                .Where(s => s.BeatmapHash == serializedScore.BeatmapHash)
+                .Where(s => s.BeatmapHash == serializedScore.BeatmapHash &&
+                            s.Gamemode == serializedScore.Gamemode)
                 .FirstOrDefaultAsync();
 
             var nextUserStats = await db.StatsWithRank
-                .Where(s => s.Rank == s.Rank - 1)
+                .Where(s => s.Rank == s.Rank - 1 &&
+                            s.Mode == (Mode)serializedScore.Gamemode)
                 .FirstOrDefaultAsync();
 
             submitManager.UpdateStats(newStats, oldScore);
             
-            await newStats.SaveChangesAsync();
+            await newStats!.SaveChangesAsync();
 
             await HttpContext.Response.WriteStringAsync(
                 submitManager.GetScorePanelString((newScore, oldScore), (newStats, oldStats), nextUserStats));
