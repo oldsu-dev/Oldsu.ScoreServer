@@ -45,7 +45,7 @@ namespace Oldsu.ScoreServer.Controllers.OsuControllers
                     .AsAsyncEnumerable(),
                 _ => db.Beatmapsets
                     .FromSqlRaw(
-                        "SELECT * FROM BeatmapSets WHERE Title LIKE CONCAT('%', {0} '%') or Artist LIKE CONCAT('%', {0}, '%') or CreatorName LIKE CONCAT('%', {0}, '%')",
+                        "SELECT * FROM Beatmapsets WHERE Title LIKE CONCAT('%', {0} '%') or Artist LIKE CONCAT('%', {0}, '%') or CreatorName LIKE CONCAT('%', {0}, '%')",
                         requestQuery)
                     .OrderByDescending(b => b.Rating)
                     .Take(100)
