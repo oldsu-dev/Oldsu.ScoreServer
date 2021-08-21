@@ -35,7 +35,8 @@ namespace Oldsu.ScoreServer.Managers
                     .AsQueryable()
                     .ToListAsync();
 
-                await AddScoresIntoCache(hash, gamemode, scoresOnMap);
+                if (scoresOnMap != null)
+                    await AddScoresIntoCache(hash, gamemode, scoresOnMap);
 
                 return scoresOnMap;
             }
@@ -61,7 +62,8 @@ namespace Oldsu.ScoreServer.Managers
                     .Include(s => s.User)
                     .FirstOrDefaultAsync();
 
-                await AddPersonalBestScoreIntoCache(hash, gamemode, userId, personalBestScore);
+                if (personalBestScore != null)
+                    await AddPersonalBestScoreIntoCache(hash, gamemode, userId, personalBestScore);
 
                 return personalBestScore;
             }
