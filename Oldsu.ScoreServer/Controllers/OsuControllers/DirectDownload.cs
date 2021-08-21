@@ -33,7 +33,7 @@ namespace Oldsu.ScoreServer.Controllers.OsuControllers
             
             // map is a bancho map
             if (map.OriginalBeatmapsetID != null)
-                return Redirect($"https://chimu.moe/d/{id}");
+                return Redirect($"https://chimu.moe/d/{map.OriginalBeatmapsetID}");
 
             // todo oldsu map
             return Ok();
