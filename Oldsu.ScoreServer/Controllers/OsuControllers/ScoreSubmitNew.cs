@@ -28,7 +28,8 @@ namespace Oldsu.ScoreServer.Controllers.OsuControllers
             var serializedScore = await TypeExtensions.SerializeScoreString(
                 HttpContext.Request.Query["score"].ToString().Split(":"));
 
-            if (serializedScore.Passed)
+            // todo not passed logic
+            if (!serializedScore.Passed)
                 return;
 
             await using var db = new Database();
