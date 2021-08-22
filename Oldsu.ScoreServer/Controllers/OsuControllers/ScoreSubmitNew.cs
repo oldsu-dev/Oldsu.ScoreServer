@@ -24,6 +24,7 @@ namespace Oldsu.ScoreServer.Controllers.OsuControllers
         [HttpPost]
         public async Task Post()
         {
+            // todo save replay
             var replay = HttpContext.Request.Body;
 
             var serializedScore = await TypeExtensions.SerializeScoreString(
@@ -125,8 +126,8 @@ namespace Oldsu.ScoreServer.Controllers.OsuControllers
                 .FirstOrDefaultAsync();
 
             submitManager.UpdateStats(newStats, oldScore);
-            
-            await newStats!.SaveChangesAsync();
+
+            await db.ExecuteStatUpdate(newStats!);
 
             await HttpContext.Response.WriteStringAsync(
                 submitManager.GetScorePanelString((newScore, oldScore), (newStats, oldStats), nextUserStats));
