@@ -90,9 +90,8 @@ namespace Oldsu.ScoreServer.Managers
                 // change to a enum instead of magic numbers
                 if (_beatmap?.Beatmapset.RankingStatus == 2)
                     if (oldScore != null && _score.Score >= oldScore.Score)
-                        // breaks single responsibility principle..? idk i dont get payed enough to care
                         userStats.RankedScore += _score.Score - oldScore.Score;
-                    else
+                    else if (oldScore == null)
                         userStats.RankedScore += _score.Score;
         }
     }
