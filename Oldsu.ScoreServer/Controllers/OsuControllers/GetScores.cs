@@ -54,7 +54,8 @@ namespace Oldsu.ScoreServer.Controllers.OsuControllers
                 await HttpContext.Response.CompleteAsync();
                 
                 await Global.LoggingManager.LogCritical<GetScores>(
-                    $"User with unknown id ({userId}) tried to fetch scores. IP Address: {HttpContext.GetServerVariable("HTTP_X_FORWARDED_FOR") ?? "unknown"}");
+                    $"User with unknown id ({userId}) tried to fetch scores. " +
+                    $"IP Address: {HttpContext.GetServerVariable("HTTP_X_FORWARDED_FOR") ?? "unknown"}");
 
                 return;
             }
