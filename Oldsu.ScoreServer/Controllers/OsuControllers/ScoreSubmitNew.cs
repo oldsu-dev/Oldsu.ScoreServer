@@ -136,16 +136,23 @@ namespace Oldsu.ScoreServer.Controllers.OsuControllers
                             s.Gamemode == serializedScore.Gamemode)
                 .FirstOrDefaultAsync();
             
-            await submitManager.SubmitScore();
+            var transaction = await db.Database.BeginTransactionAsync();
+
+            try {
+                await submitManager.SubmitScore();
+
+                submitManager.UpdateStats(newStats, oldScore);
+
+                await db.ExecuteStatUpdate(newStats!);
+            } catch {
+                /* something bad happened, abort all the changes */
+                await transaction.RollbackAsync();
+                throw;
+            }
             
             var newScore = await db.HighScoresWithRank                
                 .Where(s => s.BeatmapHash == serializedScore.BeatmapHash &&
                             s.Gamemode == serializedScore.Gamemode)
-                .FirstOrDefaultAsync();
-
-            var nextUserStats = await db.StatsWithRank
-                .Where(s => s.Rank == s.Rank - 1 &&
-                            s.Mode == (Mode)serializedScore.Gamemode)
                 .FirstOrDefaultAsync();
 
             if (serializedScore.Passed)
@@ -157,15 +164,18 @@ namespace Oldsu.ScoreServer.Controllers.OsuControllers
                     
                     await replay.CopyToAsync(replayFileStream);
                 }
-
-            submitManager.UpdateStats(newStats, oldScore);
-
-            await db.ExecuteStatUpdate(newStats!);
+            
+            var nextUserStats = await db.StatsWithRank
+                .Where(s => s.Rank == s.Rank - 1 &&
+                            s.Mode == (Mode)serializedScore.Gamemode)
+                .FirstOrDefaultAsync();
 
             if (serializedScore.Passed)
+            {
                 await HttpContext.Response.WriteStringAsync(
                     submitManager.GetScorePanelString((newScore, oldScore), (newStats, oldStats), nextUserStats));
-            
+            }
+
             await HttpContext.Response.CompleteAsync();
             
             sw.Stop();

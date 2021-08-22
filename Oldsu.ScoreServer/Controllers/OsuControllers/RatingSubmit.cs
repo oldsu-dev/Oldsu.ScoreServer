@@ -53,28 +53,38 @@ namespace Oldsu.ScoreServer.Controllers.OsuControllers
                 .Where(r => r.BeatmapsetID == beatmap.BeatmapsetID)
                 .AsAsyncEnumerable();
             
-            var ratingRow = new Rating
-            {
-                UserID = user.UserID,
-                BeatmapsetID = beatmap.BeatmapsetID,
-                Rate = float.Parse(ratingValue.ToString())
-            };
-
-            db.Add(ratingRow);
             
-            var sumOfRatings = 0f;
+            var transaction = await db.Database.BeginTransactionAsync();
 
-            await foreach (var rating in allRatings)
-                sumOfRatings += rating.Rate;
-
-            sumOfRatings += float.Parse(ratingValue.ToString());
+            float newAverage;
             
-            var newAverage = sumOfRatings / (beatmap.Beatmapset.RatingCount + 1);
+            try {
+                var ratingRow = new Rating
+                {
+                    UserID = user.UserID,
+                    BeatmapsetID = beatmap.BeatmapsetID,
+                    Rate = float.Parse(ratingValue.ToString())
+                };
 
-            beatmap.Beatmapset.Rating = newAverage;
-            beatmap.Beatmapset.RatingCount++;
+                db.Add(ratingRow);
+            
+                var sumOfRatings = 0f;
 
-            await db.SaveChangesAsync();
+                await foreach (var rating in allRatings)
+                    sumOfRatings += rating.Rate;
+
+                sumOfRatings += float.Parse(ratingValue.ToString());
+            
+                newAverage = sumOfRatings / (beatmap.Beatmapset.RatingCount + 1);
+
+                beatmap.Beatmapset.Rating = newAverage;
+                beatmap.Beatmapset.RatingCount++;
+
+                await db.SaveChangesAsync();
+            } catch {
+                await transaction.RollbackAsync();
+                throw;
+            }
 
             return Content($"{newAverage}");
         }
