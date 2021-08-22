@@ -16,9 +16,9 @@ namespace Oldsu.ScoreServer.Managers
 
         private IScoreSubmissionStrategy _scoreSubmissionStrategy;
         private ScoreRow _score;
-        private Beatmap _beatmap;
+        private Beatmap? _beatmap;
 
-        public ScoreSubmitManager(ScoreRow score, Beatmap beatmap)
+        public ScoreSubmitManager(ScoreRow score, Beatmap? beatmap)
         {
             _score = score;
             _beatmap = beatmap;
@@ -88,7 +88,7 @@ namespace Oldsu.ScoreServer.Managers
             
             if (_score.Passed)
                 // change to a enum instead of magic numbers
-                if (_beatmap.Beatmapset.RankingStatus == 2)
+                if (_beatmap?.Beatmapset.RankingStatus == 2)
                     if (oldScore != null && _score.Score >= oldScore.Score)
                         // breaks single responsibility principle..? idk i dont get payed enough to care
                         userStats.RankedScore += _score.Score - oldScore.Score;

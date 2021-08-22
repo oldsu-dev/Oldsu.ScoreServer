@@ -16,9 +16,9 @@ namespace Oldsu.ScoreServer
         /// <summary>
         ///     Boolean if replay and screenshot file saving is enabled.
         /// </summary>
-        public const bool AllowFileSaving = false;
+        public const bool AllowFileSaving = true;
         
-        public const string ReplayFolder = "";
-        public const string ScreenshotFolder = "";
+        public const string ReplayFolder = "replays\\";
+        public const string ScreenshotFolder = "screenshots\\";
     }
 }
