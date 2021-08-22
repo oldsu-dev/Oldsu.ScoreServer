@@ -153,6 +153,8 @@ namespace Oldsu.ScoreServer.Controllers.OsuControllers
                 {
                     await using var replayFileStream = System.IO.File.Create($"{Global.ReplayFolder}{newScore.ScoreId}.osr");
 
+                    replay.Seek(0, SeekOrigin.Begin);
+                    
                     await replay.CopyToAsync(replayFileStream);
                 }
 
