@@ -3,9 +3,12 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Oldsu.Logging;
+using Oldsu.Logging.Strategies;
 using Oldsu.ScoreServer.Managers;
 using Oldsu.Types;
 
@@ -15,7 +18,6 @@ namespace Oldsu.ScoreServer.Controllers.OsuControllers
     [Route("/web/osu-getscores6.php")]
     public class GetScores : ControllerBase
     {
-        private readonly ILogger<ScoreSubmission> _logger;
         private readonly Database _db;
 
         // change to redis when needed
@@ -27,16 +29,15 @@ namespace Oldsu.ScoreServer.Controllers.OsuControllers
         
         private List<HighScoreWithRank> _scoresOnMap;
 
-        public GetScores(ILogger<ScoreSubmission> logger, Database database)
+        public GetScores(Database database)
         {
-            _logger = logger;
             _db = database;
         }
 
         [HttpGet]
         public async Task Get()
         {
-            Stopwatch sw = new Stopwatch();
+            var sw = new Stopwatch();
             sw.Start();
 
             await using var db = new Database();
@@ -51,6 +52,10 @@ namespace Oldsu.ScoreServer.Controllers.OsuControllers
             {
                 await HttpContext.Response.WriteStringAsync("unknown requesting user");
                 await HttpContext.Response.CompleteAsync();
+                
+                await Global.LoggingManager.LogCritical<GetScores>(
+                    $"User with unknown id ({userId}) tried to fetch scores. IP Address: {HttpContext.GetServerVariable("HTTP_X_FORWARDED_FOR") ?? "unknown"}");
+
                 return;
             }
 
@@ -104,7 +109,7 @@ namespace Oldsu.ScoreServer.Controllers.OsuControllers
             await HttpContext.Response.CompleteAsync();
             
             sw.Stop();
-            Console.WriteLine("Elapsed={0}",sw.ElapsedMilliseconds);
+            await Global.LoggingManager.LogInfo<GetScores>($"Request took {sw.ElapsedMilliseconds}ms");
         }
     }
 }

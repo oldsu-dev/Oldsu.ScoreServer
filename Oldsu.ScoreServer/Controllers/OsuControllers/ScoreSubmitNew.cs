@@ -1,9 +1,12 @@
-﻿using System.Linq;
+﻿using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Oldsu.Enums;
+using Oldsu.Logging;
 using Oldsu.ScoreServer.Managers;
 using Oldsu.Types;
 using Oldsu.Utils;
@@ -24,6 +27,9 @@ namespace Oldsu.ScoreServer.Controllers.OsuControllers
         [HttpPost]
         public async Task Post()
         {
+            var sw = new Stopwatch();
+            sw.Start();
+            
             // todo save replay
             var replay = HttpContext.Request.Body;
 
@@ -43,6 +49,10 @@ namespace Oldsu.ScoreServer.Controllers.OsuControllers
             {
                 await HttpContext.Response.WriteStringAsync(ScoreSubmitManager.WrongPasswordMessage);
                 await HttpContext.Response.CompleteAsync();
+                
+                await Global.LoggingManager.LogInfo<ScoreSubmitNew>($"{user.Username} ({user.UserID}) submitted a score with a wrong password.");
+
+                
                 return;
             }
 
@@ -52,6 +62,9 @@ namespace Oldsu.ScoreServer.Controllers.OsuControllers
             {
                 await HttpContext.Response.WriteStringAsync(ScoreSubmitManager.BannedMessage);
                 await HttpContext.Response.CompleteAsync();
+
+                await Global.LoggingManager.LogInfo<ScoreSubmitNew>($"{user.Username} ({user.UserID}) submitted a score while banned.");
+                    
                 return;
             }
 
@@ -74,6 +87,9 @@ namespace Oldsu.ScoreServer.Controllers.OsuControllers
             if (!submitManager.SetStrategy())
             {
                 await HttpContext.Response.CompleteAsync();
+                
+                await Global.LoggingManager.LogInfo<ScoreSubmitNew>($"{user.Username} ({user.UserID}) tried to submit a score with an unsupported client.");
+
                 return;
             }
 
@@ -88,6 +104,10 @@ namespace Oldsu.ScoreServer.Controllers.OsuControllers
                     await Task.Delay(1);
                 
                 await HttpContext.Response.CompleteAsync();
+                
+                await Global.LoggingManager.LogCritical<ScoreSubmitNew>(
+                    $"{user.Username} ({user.UserID}) tried to submit an unsubmittable score due to {bannedReason}");
+
                 return;
             }
 
@@ -133,6 +153,9 @@ namespace Oldsu.ScoreServer.Controllers.OsuControllers
                 submitManager.GetScorePanelString((newScore, oldScore), (newStats, oldStats), nextUserStats));
             
             await HttpContext.Response.CompleteAsync();
+            
+            sw.Stop();
+            await Global.LoggingManager.LogInfo<GetScores>($"Request took {sw.ElapsedMilliseconds}ms");
         }
     }
 }
