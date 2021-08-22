@@ -144,6 +144,8 @@ namespace Oldsu.ScoreServer.Controllers.OsuControllers
                 submitManager.UpdateStats(newStats, oldScore);
 
                 await db.ExecuteStatUpdate(newStats!);
+                
+                await transaction.CommitAsync();
             } catch {
                 /* something bad happened, abort all the changes */
                 await transaction.RollbackAsync();

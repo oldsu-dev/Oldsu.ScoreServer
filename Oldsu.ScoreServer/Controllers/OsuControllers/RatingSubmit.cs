@@ -81,6 +81,8 @@ namespace Oldsu.ScoreServer.Controllers.OsuControllers
                 beatmap.Beatmapset.RatingCount++;
 
                 await db.SaveChangesAsync();
+                
+                await transaction.CommitAsync();
             } catch {
                 await transaction.RollbackAsync();
                 throw;
