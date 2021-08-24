@@ -61,7 +61,7 @@ namespace Oldsu.ScoreServer.Controllers.OsuControllers
             
             await foreach (var map in mapCollections)
                 stringBuilder.Append($"\n{map.BeatmapsetID}.osz|{map.Artist}|{map.Title}|{map.CreatorName}|" +
-                                     $"{map.RankingStatus}|{map.Rating}|0|{map.BeatmapsetID}|" +
+                                     $"{map.RankingStatus}|{map.Rating}|{map.SubmittedAt}|{map.BeatmapsetID}|" +
                                      $"0|0|0|0|0|");
 
             await HttpContext.Response.WriteStringAsync(stringBuilder.ToString());
