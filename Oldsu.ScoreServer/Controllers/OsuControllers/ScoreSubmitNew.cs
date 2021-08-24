@@ -132,8 +132,9 @@ namespace Oldsu.ScoreServer.Controllers.OsuControllers
             var newStats = db.Entry(oldStats).CurrentValues.Clone().ToObject() as StatsWithRank;
 
             var oldScore = await db.HighScoresWithRank
-                .Where(s => s.BeatmapHash == serializedScore.BeatmapHash &&
-                            s.Gamemode == serializedScore.Gamemode)
+                .Where(s => s.UserId == serializedScore.UserId && 
+                             s.BeatmapHash == serializedScore.BeatmapHash &&
+                             s.Gamemode == serializedScore.Gamemode)
                 .FirstOrDefaultAsync();
             
             var transaction = await db.Database.BeginTransactionAsync();
@@ -153,7 +154,8 @@ namespace Oldsu.ScoreServer.Controllers.OsuControllers
             }
             
             var newScore = await db.HighScoresWithRank                
-                .Where(s => s.BeatmapHash == serializedScore.BeatmapHash &&
+                .Where(s => s.UserId == serializedScore.UserId && 
+                            s.BeatmapHash == serializedScore.BeatmapHash &&
                             s.Gamemode == serializedScore.Gamemode)
                 .FirstOrDefaultAsync();
 
