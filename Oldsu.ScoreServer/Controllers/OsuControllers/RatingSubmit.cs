@@ -19,7 +19,7 @@ namespace Oldsu.ScoreServer.Controllers.OsuControllers
         [HttpGet]
         public async Task<IActionResult> Get()
         {
-            var db = new Database();
+            await using var db = new Database();
             
             var beatmapHash = HttpContext.Request.Query["c"];
             var ratingValue = HttpContext.Request.Query["v"];
@@ -51,9 +51,9 @@ namespace Oldsu.ScoreServer.Controllers.OsuControllers
 
             var allRatings = db.Ratings
                 .Where(r => r.BeatmapsetID == beatmap.BeatmapsetID)
+                .AsNoTracking()
                 .AsAsyncEnumerable();
-            
-            
+
             var transaction = await db.Database.BeginTransactionAsync();
 
             float newAverage;
@@ -66,8 +66,6 @@ namespace Oldsu.ScoreServer.Controllers.OsuControllers
                     Rate = float.Parse(ratingValue.ToString())
                 };
 
-                db.Add(ratingRow);
-            
                 var sumOfRatings = 0f;
 
                 await foreach (var rating in allRatings)
@@ -79,6 +77,8 @@ namespace Oldsu.ScoreServer.Controllers.OsuControllers
 
                 beatmap.Beatmapset.Rating = newAverage;
                 beatmap.Beatmapset.RatingCount++;
+                
+                db.Add(ratingRow);
 
                 await db.SaveChangesAsync();
                 

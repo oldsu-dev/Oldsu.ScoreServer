@@ -18,7 +18,7 @@ namespace Oldsu.ScoreServer.Controllers.OsuControllers
         [HttpGet]
         public async Task<IActionResult> Get()
         {
-            var db = new Database();
+            await using var db = new Database();
             
             var beatmapHash = HttpContext.Request.Query["c"];
 
