@@ -28,9 +28,6 @@ namespace Oldsu.ScoreServer.Controllers.OsuControllers
         [HttpPost]
         public async Task Post()
         {
-            var sw = new Stopwatch();
-            sw.Start();
-
             await using var replay = new MemoryStream();
             await HttpContext.Request.Body.CopyToAsync(replay);
             
@@ -181,9 +178,6 @@ namespace Oldsu.ScoreServer.Controllers.OsuControllers
             }
 
             await HttpContext.Response.CompleteAsync();
-            
-            sw.Stop();
-            await Global.LoggingManager.LogInfo<GetScores>($"Request took {sw.ElapsedMilliseconds}ms");
         }
     }
 }

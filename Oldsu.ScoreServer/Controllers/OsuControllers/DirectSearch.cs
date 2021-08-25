@@ -27,9 +27,6 @@ namespace Oldsu.ScoreServer.Controllers.OsuControllers
         [HttpGet]
         public async Task Get()
         {
-            var sw = new Stopwatch();
-            sw.Start();
-            
             var requestQuery = HttpContext.Request.Query["q"].ToString();
 
             IAsyncEnumerable<Beatmapset> mapCollections;
@@ -66,9 +63,6 @@ namespace Oldsu.ScoreServer.Controllers.OsuControllers
 
             await HttpContext.Response.WriteStringAsync(stringBuilder.ToString());
             await HttpContext.Response.CompleteAsync();
-            
-            sw.Stop();
-            await Global.LoggingManager.LogInfo<GetScores>($"Request took {sw.ElapsedMilliseconds}ms");
         }
     }
 }

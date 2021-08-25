@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Oldsu.ScoreServer.Middleware;
 
 namespace Oldsu.ScoreServer
 {
@@ -28,6 +29,8 @@ namespace Oldsu.ScoreServer
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseRequestDurationLogging();
+            
             app.UseRouting();
 
             app.UseEndpoints(endpoints =>
