@@ -108,9 +108,6 @@ namespace Oldsu.ScoreServer.Controllers.OsuControllers
                 await HttpContext.Response.WriteStringAsync(score.ToString());
             
             await HttpContext.Response.CompleteAsync();
-            
-            sw.Stop();
-            await Global.LoggingManager.LogInfo<GetScores>($"Request took {sw.ElapsedMilliseconds}ms");
         }
     }
 }
