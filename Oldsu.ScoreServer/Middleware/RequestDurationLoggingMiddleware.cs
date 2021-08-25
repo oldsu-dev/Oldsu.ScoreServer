@@ -33,7 +33,7 @@ namespace Oldsu.ScoreServer.Middleware
 
             sw.Stop();
             await Global.LoggingManager.LogInfo<RequestDurationLogging>(
-                $"Request to {context.Request.GetDisplayUrl()} took {sw.ElapsedMilliseconds}ms.");
+                $"Request to {context.Request.Path.Value} took {sw.ElapsedMilliseconds}ms.");
         }
     }
 
