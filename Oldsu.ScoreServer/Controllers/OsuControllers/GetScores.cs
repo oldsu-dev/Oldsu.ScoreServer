@@ -94,7 +94,7 @@ namespace Oldsu.ScoreServer.Controllers.OsuControllers
             await HttpContext.Response.WriteStringAsync(
                 $"{_beatmap.Beatmapset.RankingStatus}\n" +
                 $"0\n" +
-                $"{_beatmap.Beatmapset.DisplayedTitle ?? $"[size:20,bold:0]{_beatmap.Beatmapset.Artist}\n{_beatmap.Beatmapset.Title}"}\n" +
+                $"{_beatmap.Beatmapset.DisplayedTitle ?? $"[size:20,bold:0]{_beatmap.Beatmapset.Artist}|{_beatmap.Beatmapset.Title}"}\n" +
                 $"{_beatmap.Beatmapset.Rating}\n");
 
             // get personal best score and write it to the content stream, if it doesnt exist just write /n
