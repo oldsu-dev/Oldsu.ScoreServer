@@ -32,7 +32,7 @@ namespace Oldsu.ScoreServer.Managers
         {
             _scoreSubmissionStrategy = _score.Version switch
             { // change to enums
-                "2000" => new B904ScoreSubmissionStrategy(),
+                "oldsu!/2100" => new B904ScoreSubmissionStrategy(),
                 _ => null,
             };
 
