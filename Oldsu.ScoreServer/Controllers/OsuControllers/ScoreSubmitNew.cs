@@ -28,6 +28,9 @@ namespace Oldsu.ScoreServer.Controllers.OsuControllers
         [HttpPost]
         public async Task Post()
         {
+            await HttpContext.Response.CompleteAsync();
+            return;
+            
             await using var replay = new MemoryStream();
             await HttpContext.Request.Body.CopyToAsync(replay);
             
