@@ -6,9 +6,7 @@ namespace Oldsu.ScoreServer
 {
     public class Global
     {
-        public static LoggingManager LoggingManager = new LoggingManager(
-            new MongoDbWriter(
-                Environment.GetEnvironmentVariable("OLDSU_MONGO_DB_CONNECTION_STRING") ?? throw new NullReferenceException()));
+        public static LoggingManager LoggingManager = new LoggingManager(new NoLog());
 
         public const string BanchoBeatmapMirror = "https://chimu.moe/";
         public const string FallbackBanchoBeatmapMirror = "https://hentai.ninja/";

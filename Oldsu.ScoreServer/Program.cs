@@ -23,6 +23,12 @@ namespace Oldsu.ScoreServer
                 Directory.CreateDirectory(Global.ScreenshotFolder);   
             }
 
+            if (Environment.GetEnvironmentVariable("OLDSU_MONGO_DB_CONNECTION_STRING") != null)
+            {
+                Global.LoggingManager= new LoggingManager(new MongoDbWriter(
+                    Environment.GetEnvironmentVariable("OLDSU_MONGO_DB_CONNECTION_STRING")));
+            }
+
             CreateHostBuilder(args).Build().Run();
         }
 
