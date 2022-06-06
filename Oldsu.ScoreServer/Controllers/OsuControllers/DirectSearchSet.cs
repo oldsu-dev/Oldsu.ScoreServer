@@ -59,8 +59,8 @@ namespace Oldsu.ScoreServer.Controllers.OsuControllers
                 return;
             }
 
-            await HttpContext.Response.WriteStringAsync($"\n{map.BeatmapsetID}.osz|{map.Beatmapset.Artist}|{map.Beatmapset.Title}|{map.Beatmapset.CreatorName}|" +
-                                                        $"{map.Beatmapset.RankingStatus}|{map.Beatmapset.Rating}|0|{map.BeatmapsetID}|" +
+            await HttpContext.Response.WriteStringAsync($"\n{map.BeatmapsetID} {map.Beatmapset.Artist} - {map.Beatmapset.Title}.osz|{map.Beatmapset.Artist}|{map.Beatmapset.Title}|{map.Beatmapset.CreatorName}|" +
+                                                        $"{(sbyte)map.Beatmapset.RankingStatus}|{map.Beatmapset.Rating}|0|{map.BeatmapsetID}|" +
                                                         $"0|0|0|0|0|");
             
             await HttpContext.Response.CompleteAsync();
