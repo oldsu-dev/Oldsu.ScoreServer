@@ -11,6 +11,7 @@ using Oldsu.Logging;
 using Oldsu.Logging.Strategies;
 using Oldsu.ScoreServer.Managers;
 using Oldsu.Types;
+using Oldsu.Enums;
 
 namespace Oldsu.ScoreServer.Controllers.OsuControllers
 {
@@ -90,9 +91,20 @@ namespace Oldsu.ScoreServer.Controllers.OsuControllers
                first score: 1|56|6|1|..... user's personal best score. if there is no personal best it's empty/something that isn't valid
                other scores: same thing...... all the other scores that show up on the leaderboard
             */
-            
-            await HttpContext.Response.WriteStringAsync(
-                $"{(sbyte)_beatmap.Beatmapset.RankingStatus}\n" +
+
+            sbyte ClientRankedStatus = _beatmap.Beatmapset.RankingStatus switch
+			{
+				RankingStatus.Graveyard => 0,
+				RankingStatus.WIP => 0,
+				RankingStatus.Pending => 0,
+				RankingStatus.Ranked => 2,
+				RankingStatus.Approved => 3,
+				_ => 0,
+			};
+
+
+			await HttpContext.Response.WriteStringAsync(
+                $"{ClientRankedStatus}\n" +
                 $"0\n" +
                 $"{_beatmap.Beatmapset.DisplayedTitle ?? $"[size:20,bold:0]{_beatmap.Beatmapset.Artist}|{_beatmap.Beatmapset.Title}"}\n" +
                 $"{_beatmap.Beatmapset.Rating}\n");
