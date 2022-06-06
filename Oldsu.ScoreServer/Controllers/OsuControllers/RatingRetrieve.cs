@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Oldsu.Types;
+using Oldsu.Enums;
 
 namespace Oldsu.ScoreServer.Controllers.OsuControllers
 {
@@ -36,7 +37,7 @@ namespace Oldsu.ScoreServer.Controllers.OsuControllers
             if (beatmap == null)
                 return Content("no exist");
             
-            if (beatmap.Beatmapset.RankingStatus == 0)
+            if (beatmap.Beatmapset.RankingStatus <= RankingStatus.Ranked)
                 return Content("not ranked");
             
             if ((beatmap.Beatmapset.CreatorID ?? 0) == user.UserID)
