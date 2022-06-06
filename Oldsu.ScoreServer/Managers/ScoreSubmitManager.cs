@@ -87,8 +87,7 @@ namespace Oldsu.ScoreServer.Managers
             userStats.UpdateStats(_score);
             
             if (_score.Passed)
-                // change to a enum instead of magic numbers
-                if (_beatmap?.Beatmapset.RankingStatus == 2)
+                if (_beatmap?.Beatmapset.RankingStatus == RankingStatus.Ranked)
                     if (oldScore != null && _score.Score >= oldScore.Score)
                         userStats.RankedScore += _score.Score - oldScore.Score;
                     else if (oldScore == null)

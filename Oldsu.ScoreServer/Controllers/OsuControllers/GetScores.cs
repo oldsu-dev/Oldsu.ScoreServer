@@ -92,7 +92,7 @@ namespace Oldsu.ScoreServer.Controllers.OsuControllers
             */
             
             await HttpContext.Response.WriteStringAsync(
-                $"{_beatmap.Beatmapset.RankingStatus}\n" +
+                $"{(sbyte)_beatmap.Beatmapset.RankingStatus}\n" +
                 $"0\n" +
                 $"{_beatmap.Beatmapset.DisplayedTitle ?? $"[size:20,bold:0]{_beatmap.Beatmapset.Artist}|{_beatmap.Beatmapset.Title}"}\n" +
                 $"{_beatmap.Beatmapset.Rating}\n");
