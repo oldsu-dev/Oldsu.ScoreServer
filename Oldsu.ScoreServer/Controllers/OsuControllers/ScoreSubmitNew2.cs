@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using HttpMultipartParser;
 using Microsoft.AspNetCore.Mvc;
@@ -53,7 +54,7 @@ namespace Oldsu.ScoreServer.Controllers.OsuControllers
             await Global.LoggingManager.LogInfo<ScoreSubmitNew>(
                 $"{user.Username} ({user.UserID}) procs: {parser.GetParameterValue("procs")}");
             
-            if (!Request.Headers.TryGetValue("User-Agent", out var uAgent) || uAgent.ToString() != "oldsu!/2100") 
+            if (!Request.Headers.TryGetValue("User-Agent", out var uAgent) || (uAgent.ToString() != "oldsu!/2100" && uAgent.ToString() != "oldsu!/2110")) 
             {
                 await HttpContext.Response.CompleteAsync();
 
@@ -100,41 +101,28 @@ namespace Oldsu.ScoreServer.Controllers.OsuControllers
             var replayFound = false;
 
             Stream replay = null;
-            
-            foreach (var file in parser.Files)
+
+            // Sorry jiniux for my spaghetti code. This is janky and probably needs to be fixed but it should work.
+            var replayFile = Encoding.ASCII.GetBytes(parser.GetParameterValue("replay"));
+
+            if (replayFile.Length is 0 or > 50000000)
             {
-                switch (file.Name)
+                // if user didnt pass the map the replay is going to be 0
+                if (!(replayFile.Length == 0 && serializedScore.Passed == false))
                 {
-                    case "replay":
-                        replayFound = true;
-                        if (file.Data.Length is 0 or > 50000000)
-                        {
-                            // if user didnt pass the map the replay is going to be 0
-                            if (!(file.Data.Length == 0 && serializedScore.Passed == false))
-                            {
-                                isSubmittable = false;
+                    isSubmittable = false;
 
-                                if (bannedReason != null)
-                                    bannedReason += $" Replay was of size {file.Data.Length}.";
-                                else
-                                    bannedReason = $"Replay was of size {file.Data.Length}.";
-                            }
-                        }
-                        else
-                            replay = file.Data;
-
-                        break;
-                    default:
-                        isSubmittable = false;
-                        if (bannedReason != null)
-                            bannedReason += $" unknown form values {file.Name}.";
-                        else
-                            bannedReason = $"unknown form values {file.Name}.";
-                        await Global.LoggingManager.LogCritical<ScoreSubmitNew>(
-                            $"{user.Username} ({user.UserID}) submitted a score with unknown form values {file.Name}.");
-                        break;
+                    if (bannedReason != null)
+                        bannedReason += $" Replay was of size {replayFile.Length}.";
+                    else
+                        bannedReason = $"Replay was of size {replayFile.Length}.";
                 }
             }
+            else
+                replayFound = true;
+                replay = new MemoryStream(replayFile);
+            
+
 
             if (!replayFound)
                 if (bannedReason != null)
@@ -147,7 +135,7 @@ namespace Oldsu.ScoreServer.Controllers.OsuControllers
                 await HttpContext.Response.WriteStringAsync(responseString);
 
                 if (responseString == ScoreSubmitManager.BannedMessage)
-                    //db.ban(username)
+                    //db.ban(username) 
                     await Task.Delay(1);
                 
                 await HttpContext.Response.CompleteAsync();
