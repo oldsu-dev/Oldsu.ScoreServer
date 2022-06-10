@@ -105,7 +105,7 @@ namespace Oldsu.ScoreServer.Controllers.OsuControllers
 
 			await HttpContext.Response.WriteStringAsync(
                 $"{ClientRankedStatus}\n" +
-                $"0\n" +
+                $"{_beatmap.Beatmapset.OnlineOffset}\n" +
                 $"{_beatmap.Beatmapset.DisplayedTitle ?? $"[size:20,bold:0]{_beatmap.Beatmapset.Artist}|{_beatmap.Beatmapset.Title}"}\n" +
                 $"{_beatmap.Beatmapset.Rating}\n");
 
