@@ -37,7 +37,7 @@ namespace Oldsu.ScoreServer.Controllers.OsuControllers
             if (beatmap == null)
                 return Content("no exist");
             
-            if (beatmap.Beatmapset.RankingStatus <= RankingStatus.Ranked)
+            if (beatmap.Beatmapset.RankingStatus < RankingStatus.Ranked)
                 return Content("not ranked");
             
             if ((beatmap.Beatmapset.CreatorID ?? 0) == user.UserID)
