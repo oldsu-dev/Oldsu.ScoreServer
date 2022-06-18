@@ -9,8 +9,8 @@ namespace Oldsu.ScoreServer.Managers.ScoreSubmissionStrategies
             return true;
         }
 
-        public string GetScorePanelString((HighScoreWithRank, HighScoreWithRank) comparableScores, (StatsWithRank, StatsWithRank) comparableUsers,
-            StatsWithRank? nextUser)
+        public string GetScorePanelString((HighScoreWithRank, HighScoreWithRank) comparableScores, (Stats, Stats) comparableUsers,
+            Stats nextUser)
         {
             var (score, _) = comparableScores;
 

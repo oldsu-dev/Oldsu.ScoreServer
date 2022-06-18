@@ -7,7 +7,7 @@ namespace Oldsu.ScoreServer.Managers.ScoreSubmissionStrategies
     {
         public bool ValidateScoreChecksum(ScoreRow scoreRow);
         public string GetScorePanelString((HighScoreWithRank, HighScoreWithRank) comparableScores,
-                                          (StatsWithRank, StatsWithRank) comparableUsers,
-                                          StatsWithRank nextUser);
+                                          (Stats, Stats) comparableUsers,
+                                          Stats nextUser);
     }
 }

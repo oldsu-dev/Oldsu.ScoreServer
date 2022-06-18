@@ -32,7 +32,7 @@ namespace Oldsu.ScoreServer.Managers
         {
             _scoreSubmissionStrategy = _score.Version switch
             { // change to enums
-                "oldsu!/2100" => new B904ScoreSubmissionStrategy(),
+                "2100" => new B904ScoreSubmissionStrategy(),
                 _ => null,
             };
 
@@ -65,8 +65,8 @@ namespace Oldsu.ScoreServer.Managers
         }
 
         public string GetScorePanelString((HighScoreWithRank, HighScoreWithRank) comparableScores,
-            (StatsWithRank, StatsWithRank) comparableUsers,
-            StatsWithRank nextUser) =>
+            (Stats, Stats) comparableUsers,
+            Stats nextUser) =>
             _scoreSubmissionStrategy.GetScorePanelString(comparableScores,
                 comparableUsers,
                 nextUser);
@@ -82,7 +82,7 @@ namespace Oldsu.ScoreServer.Managers
             await db.SaveChangesAsync();
         }
 
-        public void UpdateStats(StatsWithRank userStats, HighScoreWithRank? oldScore)
+        public void UpdateStats(Stats userStats, HighScoreWithRank? oldScore)
         {
             userStats.UpdateStats(_score);
             

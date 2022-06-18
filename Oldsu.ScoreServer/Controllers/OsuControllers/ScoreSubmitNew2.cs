@@ -32,13 +32,12 @@ namespace Oldsu.ScoreServer.Controllers.OsuControllers
         {
             var parser = await MultipartFormDataParser.ParseAsync(HttpContext.Request.Body);
 
-            var serializedScore = await TypeExtensions.SerializeScoreString(
-                parser.GetParameterValue("score").Split(":"));
+            string[] scoreInfo = parser.GetParameterValue("score").Split(":");
 
             await using var db = new Database();
-
+            
             var user = await db.AuthenticateAsync(
-                serializedScore?.User?.Username ?? "", parser.GetParameterValue("password"));
+                scoreInfo[1], parser.GetParameterValue("password"));
 
             if (user == null)
             {
@@ -46,10 +45,12 @@ namespace Oldsu.ScoreServer.Controllers.OsuControllers
                 await HttpContext.Response.CompleteAsync();
 
                 await Global.LoggingManager.LogCritical<ScoreSubmitNew>(
-                    $"{serializedScore?.User?.Username} submitted a score with a wrong password. (attempted fraud?)");
+                    $"{scoreInfo[1]} submitted a score with a wrong password. (attempted fraud?)");
 
                 return;
             }
+
+            var serializedScore = await TypeExtensions.SerializeScoreString(scoreInfo, user.UserID);
 
             await Global.LoggingManager.LogInfo<ScoreSubmitNew>(
                 $"{user.Username} ({user.UserID}) procs: {parser.GetParameterValue("procs")}");
@@ -64,7 +65,10 @@ namespace Oldsu.ScoreServer.Controllers.OsuControllers
                 return;
             }
 
-            serializedScore!.Version = uAgent.ToString();
+            string ua = uAgent.ToString();
+            string[] splittedUa = ua.Split('/');
+
+            serializedScore!.Version = splittedUa[1];
             serializedScore!.User = user;
 
             if (user.Banned)
@@ -103,25 +107,27 @@ namespace Oldsu.ScoreServer.Controllers.OsuControllers
             Stream replay = null;
 
             // Sorry jiniux for my spaghetti code. This is janky and probably needs to be fixed but it should work.
-            var replayFile = Encoding.ASCII.GetBytes(parser.GetParameterValue("replay"));
-
-            if (replayFile.Length is 0 or > 50000000)
+            FilePart part = parser.Files.FirstOrDefault(n => n.Name == "replay");
+            if (part == null)
+                replayFound = false;
+            else if (part.Data.Length is 0 or > 50000000)
             {
                 // if user didnt pass the map the replay is going to be 0
-                if (!(replayFile.Length == 0 && serializedScore.Passed == false))
+                if (!(part.Data.Length == 0 && serializedScore.Passed == false))
                 {
                     isSubmittable = false;
 
                     if (bannedReason != null)
-                        bannedReason += $" Replay was of size {replayFile.Length}.";
+                        bannedReason += $" Replay was of size {part.Data.Length}.";
                     else
-                        bannedReason = $"Replay was of size {replayFile.Length}.";
+                        bannedReason = $"Replay was of size {part.Data.Length}.";
                 }
             }
             else
+            {
                 replayFound = true;
-                replay = new MemoryStream(replayFile);
-            
+                replay = part.Data;
+            }
 
 
             if (!replayFound)
@@ -146,23 +152,22 @@ namespace Oldsu.ScoreServer.Controllers.OsuControllers
                 return;
             }
 
-            var oldStats = await db.StatsWithRank
+            var stats = await db.Stats
                 .Where(s => s.UserID == user.UserID &&
                             s.Mode == (Mode)serializedScore.Gamemode)
-                .AsNoTracking()
                 .FirstOrDefaultAsync();
 
             // user either new or trying a new gamemode
-            if (oldStats == null)
+            if (stats == null)
+            {
                 await db.AddStatsAsync(user.UserID, serializedScore.Gamemode);
+                stats = await db.Stats
+                    .Where(s => s.UserID == user.UserID &&
+                                s.Mode == (Mode)serializedScore.Gamemode)
+                    .FirstAsync();
+            }
             
-            oldStats = await db.StatsWithRank
-                .Where(s => s.UserID == user.UserID &&
-                            s.Mode == (Mode)serializedScore.Gamemode)
-                .AsNoTracking()
-                .FirstOrDefaultAsync();
-            
-            var newStats = db.Entry(oldStats).CurrentValues.Clone().ToObject() as StatsWithRank;
+            var oldStats = db.Entry(stats).CurrentValues.Clone().ToObject() as Stats;
 
             var oldScore = await db.HighScoresWithRank
                 .Where(s => s.UserId == serializedScore.UserId && 
@@ -175,9 +180,9 @@ namespace Oldsu.ScoreServer.Controllers.OsuControllers
             try {
                 await submitManager.SubmitScore();
 
-                submitManager.UpdateStats(newStats, oldScore);
+                submitManager.UpdateStats(stats, oldScore);
 
-                await db.ExecuteStatUpdate(newStats!);
+                await db.ExecuteStatUpdate(stats!);
                 
                 await transaction.CommitAsync();
             } catch {
@@ -202,15 +207,18 @@ namespace Oldsu.ScoreServer.Controllers.OsuControllers
                     await replay.CopyToAsync(replayFileStream);
                 }
             
-            var nextUserStats = await db.StatsWithRank
+            
+            var nextUserStatsWithRank = await db.StatsWithRank
                 .Where(s => s.Rank == s.Rank - 1 &&
                             s.Mode == (Mode)serializedScore.Gamemode)
                 .FirstOrDefaultAsync();
 
+            var nextUserStats = nextUserStatsWithRank?.ToStats();
+            
             if (serializedScore.Passed)
             {
                 await HttpContext.Response.WriteStringAsync(
-                    submitManager.GetScorePanelString((newScore, oldScore), (newStats, oldStats), nextUserStats));
+                    submitManager.GetScorePanelString((newScore, oldScore), (stats, oldStats), nextUserStats));
             }
 
             await HttpContext.Response.CompleteAsync();
