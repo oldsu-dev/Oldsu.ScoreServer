@@ -87,7 +87,7 @@ namespace Oldsu.ScoreServer.Managers
             userStats.UpdateStats(_score);
             
             if (_score.Passed)
-                if (_beatmap?.Beatmapset.RankingStatus == RankingStatus.Ranked)
+                if ((_beatmap?.Beatmapset.RankingStatus == RankingStatus.Ranked) && (!_beatmap.OverrideForApproval))
                     if (oldScore != null && _score.Score >= oldScore.Score)
                         userStats.RankedScore += _score.Score - oldScore.Score;
                     else if (oldScore == null)

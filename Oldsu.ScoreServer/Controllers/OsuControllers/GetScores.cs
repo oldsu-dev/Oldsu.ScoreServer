@@ -102,6 +102,9 @@ namespace Oldsu.ScoreServer.Controllers.OsuControllers
 				_ => 0,
 			};
 
+            if (_beatmap.Beatmapset.RankingStatus == RankingStatus.Ranked && _beatmap.OverrideForApproval) {
+                ClientRankedStatus = 3;
+			}
 
 			await HttpContext.Response.WriteStringAsync(
                 $"{ClientRankedStatus}\n" +
