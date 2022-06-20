@@ -13,7 +13,7 @@ namespace Oldsu.ScoreServer.Managers.ScoreSubmissionStrategies
                  scoreRow.HitGeki, 
                  scoreRow.HitKatu, 
                  scoreRow.HitMiss, 
-                 scoreRow.Beatmap.BeatmapHash, 
+                 scoreRow.BeatmapHash, 
                  scoreRow.MaxCombo, 
                  scoreRow.Perfect,
                  username, scoreRow.Score, 
