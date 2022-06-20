@@ -20,11 +20,11 @@ namespace Oldsu.ScoreServer.Controllers.OsuControllers
     [Route("/web/osu-submit-new2.php")]
     public class ScoreSubmitNew2 : ControllerBase
     {
-        private readonly ILogger<ScoreSubmission> _logger;
+        private BanchoInterface _banchoInterface;
         
-        public ScoreSubmitNew2(ILogger<ScoreSubmission> logger)
+        public ScoreSubmitNew2(BanchoInterface banchoInterface)
         {
-            _logger = logger;
+            _banchoInterface = banchoInterface;
         }
 
         [HttpPost]
@@ -106,10 +106,11 @@ namespace Oldsu.ScoreServer.Controllers.OsuControllers
 
             Stream replay = null;
 
-            // Sorry jiniux for my spaghetti code. This is janky and probably needs to be fixed but it should work.
             FilePart part = parser.Files.FirstOrDefault(n => n.Name == "replay");
+            
             if (part == null)
                 replayFound = false;
+            
             else if (part.Data.Length is 0 or > 50000000)
             {
                 // if user didnt pass the map the replay is going to be 0
@@ -141,9 +142,11 @@ namespace Oldsu.ScoreServer.Controllers.OsuControllers
                 await HttpContext.Response.WriteStringAsync(responseString);
 
                 if (responseString == ScoreSubmitManager.BannedMessage)
-                    //db.ban(username) 
-                    await Task.Delay(1);
-                
+                {
+                    await db.BanUser(user.UserID, bannedReason);
+                    await _banchoInterface.KickUser(user.Username);
+                }
+
                 await HttpContext.Response.CompleteAsync();
                 
                 await Global.LoggingManager.LogCritical<ScoreSubmitNew>(

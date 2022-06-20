@@ -14,7 +14,6 @@ namespace Oldsu.ScoreServer
 {
     public class Program
     {
-
         public static void Main(string[] args)
         {
             if (Global.AllowFileSaving)
@@ -26,7 +25,7 @@ namespace Oldsu.ScoreServer
             if (Environment.GetEnvironmentVariable("OLDSU_MONGO_DB_CONNECTION_STRING") != null)
             {
                 Global.LoggingManager= new LoggingManager(new MongoDbWriter(
-                    Environment.GetEnvironmentVariable("OLDSU_MONGO_DB_CONNECTION_STRING")));
+                    Environment.GetEnvironmentVariable("OLDSU_MONGO_DB_CONNECTION_STRING")!));
             }
 
             CreateHostBuilder(args).Build().Run();

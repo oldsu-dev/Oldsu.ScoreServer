@@ -19,6 +19,8 @@ namespace Oldsu.ScoreServer
         {
             services.AddControllers();
             services.AddDbContext<Database>();
+            services.AddSingleton(_ =>
+                new BanchoInterface(Environment.GetEnvironmentVariable("OLDSU_BANCHO_ENDPOINT")));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
