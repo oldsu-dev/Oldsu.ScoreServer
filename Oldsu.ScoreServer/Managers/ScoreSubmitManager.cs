@@ -15,11 +15,14 @@ namespace Oldsu.ScoreServer.Managers
         public const string ErrorMessage = "error: no";
 
         private IScoreSubmissionStrategy _scoreSubmissionStrategy;
+
         private ScoreRow _score;
         private Beatmap? _beatmap;
+        private UserInfo _user;
 
-        public ScoreSubmitManager(ScoreRow score, Beatmap? beatmap)
+        public ScoreSubmitManager(UserInfo user, ScoreRow score, Beatmap? beatmap)
         {
+            _user = user;
             _score = score;
             _beatmap = beatmap;
         }
@@ -56,7 +59,7 @@ namespace Oldsu.ScoreServer.Managers
                 return (false, null, null);
             }
             
-            if (!_scoreSubmissionStrategy.ValidateScoreChecksum(_score))
+            if (!_scoreSubmissionStrategy.ValidateScoreChecksum(_user.Username, _score))
                 return (false, BannedMessage, "Invalid score checksum.");
                 
             //todo check score

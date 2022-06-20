@@ -87,8 +87,7 @@ namespace Oldsu.ScoreServer.Controllers.OsuControllers
                 .Include(b => b.Beatmapset)
                 .FirstOrDefaultAsync();
 
-            var submitManager = new ScoreSubmitManager
-                (serializedScore, beatmap);
+            var submitManager = new ScoreSubmitManager(user, serializedScore, beatmap);
 
             if (!submitManager.SetStrategy())
             {
