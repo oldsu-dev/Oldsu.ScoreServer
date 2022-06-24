@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -8,7 +8,7 @@ using Oldsu.Enums;
 namespace Oldsu.ScoreServer.Controllers.OsuControllers
 {
     [ApiController]
-    [Route("/web/ingame-rate.php")]
+    [Route("/rating/ingame-rate.php")]
     public class RatingRetrieve : Controller
     {
         public RatingRetrieve()
