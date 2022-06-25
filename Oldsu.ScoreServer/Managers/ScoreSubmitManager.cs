@@ -91,7 +91,7 @@ namespace Oldsu.ScoreServer.Managers
             
             if (_score.Passed)
                 if ((_beatmap?.Beatmapset.RankingStatus == RankingStatus.Ranked) && (!_beatmap.OverrideForApproval))
-                    if (oldScore != null && _score.Score >= oldScore.Score)
+                    if (oldScore != null && _score.Score > oldScore.Score)
                         userStats.RankedScore += _score.Score - oldScore.Score;
                     else if (oldScore == null)
                         userStats.RankedScore += _score.Score;
