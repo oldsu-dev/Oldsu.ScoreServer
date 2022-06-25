@@ -18,13 +18,6 @@ namespace Oldsu.ScoreServer.Controllers.OsuControllers
     [Route("/web/osu-submit-new.php")]
     public class ScoreSubmitNew : ControllerBase // score submission for atleast 2009-2012
     {
-        private readonly ILogger<ScoreSubmission> _logger;
-        
-        public ScoreSubmitNew(ILogger<ScoreSubmission> logger)
-        {
-            _logger = logger;
-        }
-        
         [HttpPost]
         public async Task Post()
         {

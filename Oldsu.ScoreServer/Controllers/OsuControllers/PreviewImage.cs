@@ -12,14 +12,7 @@ namespace Oldsu.ScoreServer.Controllers.OsuControllers
     [Route("/preview/images/{id}")]
     public class PreviewImage : ControllerBase
     {
-        private readonly ILogger<ScoreSubmission> _logger;
-        
         private static readonly AsyncDictionaryWithExpiration<string> ResponseCache = new();
-        
-        public PreviewImage(ILogger<ScoreSubmission> logger)
-        {
-            _logger = logger;
-        }
         
         [HttpGet]
         public async Task<IActionResult> Get(string id)
@@ -58,15 +51,8 @@ namespace Oldsu.ScoreServer.Controllers.OsuControllers
     [Route("/preview/largeimages/{id}")]
     public class PreviewLargeImage : ControllerBase
     {
-        private readonly ILogger<ScoreSubmission> _logger;
-        
         private static readonly AsyncDictionaryWithExpiration<string> ResponseCache = new();
         
-        public PreviewLargeImage(ILogger<ScoreSubmission> logger)
-        {
-            _logger = logger;
-        }
-
         [HttpGet]
         public async Task<IActionResult> Get(string id)
         {

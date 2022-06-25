@@ -10,13 +10,6 @@ namespace Oldsu.ScoreServer.Controllers.OsuControllers
     [Route("/d/{id}")]
     public class DirectDownload : ControllerBase
     {
-        private readonly ILogger<ScoreSubmission> _logger;
-        
-        public DirectDownload(ILogger<ScoreSubmission> logger)
-        {
-            _logger = logger;
-        }
-
         [HttpGet]
         public async Task<IActionResult> Get(string id)
         {

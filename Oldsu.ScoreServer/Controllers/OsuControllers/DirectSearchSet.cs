@@ -17,13 +17,6 @@ namespace Oldsu.ScoreServer.Controllers.OsuControllers
     [Route("/web/osu-search-set.php")]
     public class DirectSearchSet : ControllerBase
     {
-        private readonly ILogger<ScoreSubmission> _logger;
-        
-        public DirectSearchSet(ILogger<ScoreSubmission> logger)
-        {
-            _logger = logger;
-        }
-
         [HttpGet]
         public async Task Get()
         {
