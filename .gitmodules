@@ -1,4 +1,4 @@
 [submodule "oldsu"]
 	path = oldsu
-	url = https://gitlab.ayyeve.xyz/oldsu/oldsu
-	branch = dev
+	url = https://github.com/oldsu-dev/Oldsu/oldsu
+	branch = master
